@@ -1,3 +1,9 @@
+package TextAdventure;
+
+import java.awt.*;
+import java.io.Console;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -1283,33 +1289,42 @@ public class TextAdventure {
 
     /**
      * This method starts the game on two threads.
+     * @throws IOException
+     * @throws URISyntaxException
      * @since 1.0
      */
-    public static void main(String[] args) {
-        System.out.println("Running Setup");
-        setup();
-        System.out.println("Finished Setup");
-        Thread StartGame = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    startGame();
-                } catch (InterruptedException e) {
-                    throw new Error("Failed to start Game.");
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        Console console = System.console();
+        if (console == null && !GraphicsEnvironment.isHeadless()) {
+            String filename = (TextAdventure.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+            System.out.println(filename.substring(1));
+            Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + filename.substring(1).replace("/", "\\") + "\""});
+        } else {
+            System.out.println("Running Setup");
+            setup();
+            System.out.println("Finished Setup");
+            Thread StartGame = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        startGame();
+                    } catch (InterruptedException e) {
+                        throw new Error("Failed to start Game.");
+                    }
                 }
-            }
-        });
-        StartGame.start();
-        Thread Dead = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    dead();
-                } catch (InterruptedException e) {
-                    throw new Error("Failed to start Dead method.");
+            });
+            StartGame.start();
+            Thread Dead = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        dead();
+                    } catch (InterruptedException e) {
+                        throw new Error("Failed to start Dead method.");
+                    }
                 }
-            }
-        });
-        Dead.start();
+            });
+            Dead.start();
+        }
     }
 }
